@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+# Licensed Materials - Property of IBM
+# (c) Copyright IBM Corporation 2014. All Rights Reserved.
+# 
+#  Note to U.S. Government Users Restricted Rights:  
+#  Use, duplication or disclosure restricted by GSA ADP Schedule 
+#  Contract with IBM Corp. 
+#
+#
+# 	jazzRepoUrl		Specifies the URL to CCM application
+#					example: jazzRepoUrl='https://localhost:9443/ccm'
+#	gitRepoKey		The repository key generated when a Git repository is registered with RTC.
+#					For generating this key visit Source Control -> Work with Git -> 'Register a Git Repository link'
+#					example: gitRepoKey=459b3e8774be4c5e9013326e3329645a
+#	pythonPath		Location where Python 3.3.5 is installed
+#					example: pythonPath="C:/Python33/python"
+#	hooksPath		Location where Git Python hook scripts are copied
+#					example hooksPath="C:/PythonScripts/rtcgithooks" 
+#
+
+remote="$1"
+url="$2"
+userId="$REMOTE_USER"
+z40=0000000000000000000000000000000000000000
+IFS=' '
+jazzRepoUrl=https://localhost:9443/ccm
+gitRepoKey=459b3e8774be4c5e9013326e3329645a
+pythonPath="C:/Python33/python"
+hooksPath="C:/rtcgithooks"
+
+while read oldRev newRev refName; do
+  echo oldRev=$oldRev newRev=$newRev refName=$refName
+  $pythonPath $hooksPath/ValidatePush.py $jazzRepoUrl $gitRepoKey $userId $oldRev $newRev $refName 
+  if [ $? -ne 0 ]; 
+  then
+    exit 1
+  fi
+done
+
+exit 0
